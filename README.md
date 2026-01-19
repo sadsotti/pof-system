@@ -66,7 +66,7 @@ Il sistema utilizza paradigmi moderni per la manipolazione dei dati:
 Per scaricare il progetto in locale sul tuo PC, apri il terminale ed esegui:
 
 ```bash
-git clone https://github.com/sadsotti/progetto-pof.git
+git clone https://github.com/sadsotti/pof-system.git
 ```
 
 Dopo la clonazione, entra nella cartella del progetto:
