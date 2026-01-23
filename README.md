@@ -1,101 +1,100 @@
-# 🥗 Planty of Food (POF) - Software Gestionale E-commerce
+# 🥗 Planty of Food (POF) - E-commerce Management Software
 
-**Planty of Food** è un'applicazione Java progettata per gestire i flussi operativi di un e-commerce alimentare sostenibile. Il sistema permette la gestione centralizzata di prodotti biologici, l'anagrafica dei clienti e il tracciamento delle vendite/restituzioni, riflettendo l'impegno dell'azienda verso una filiera trasparente.
+**Planty of Food** is a Java application designed to manage the operational workflows of a sustainable food e-commerce platform. The system allows for centralized management of organic products, customer registries, and tracking of sales/returns, reflecting the company's commitment to a transparent supply chain.
 
 ## 🌱 Vision & Mission
-* **Vision:** Rendere l'alimentazione plant-based accessibile, etica e biologica.
-* **Mission:** Supportare i produttori italiani e ridurre l'impatto ambientale attraverso packaging compostabili e una gestione digitale efficiente.
+* **Vision:** To make plant-based, ethical, and organic food accessible to everyone.
+* **Mission:** To support local producers and reduce environmental impact through compostable packaging and efficient digital management.
 
 ---
 
-## 📂 Struttura del Progetto (Tree)
-Il progetto segue le convenzioni Maven e una chiara separazione dei package:
+## 📂 Project Structure (Tree)
+The project follows Maven conventions and a clear separation of packages:
 
 ```text
-.
-├── pom.xml                     # Configurazione Maven e dipendenze
-├── README.md                   # Questo file
-├── prodotti.csv                # Database prodotti
-├── utenti.csv                  # Anagrafica utenti
-├── vendite.csv                 # Registro transazioni
+├── pom.xml                     # Maven configuration and dependencies
+├── README.md                   # This file
+├── products.csv                # Product database
+├── users.csv                   # User registry
+├── sales.csv                   # Transaction log
 └── src
     └── main
         └── java
             └── it
                 └── pof
-                    ├── Main.java              # Interfaccia Utente (CLI)
-                    ├── models                 # Package: Entità del dominio
-                    │   ├── Utente.java        
-                    │   ├── Prodotto.java      
-                    │   └── Vendita.java       
-                    └── service                # Package: Logica applicativa
-                        └── GestionaleService.java # Business Logic e I/O
+                    ├── Main.java              # User Interface (CLI)
+                    ├── models                 # Package: Domain entities
+                    │   ├── User.java        
+                    │   ├── Product.java      
+                    │   └── Sale.java       
+                    └── service                # Package: Application logic
+                        └── ManagementService.java # Business Logic and I/O
 ```
 
-📊 Organizzazione dei File CSV (Database)
-I dati sono persistiti in formato CSV utilizzando il punto e virgola (`;`) come delimitatore.
+📊 CSV File Organization (Database)
+Data is persisted in CSV format using the semicolon (`;`) as a delimiter.
 
-### 1. `prodotti.csv` (Catalogo alimenti)
-* **Struttura:** `ID;Nome;Data di inserimento;Prezzo;Marca;Disponibile`
-* **Esempio:** `1;Latte di mandorla;22/07/2021;2,15 €;Bjorg;SI`
+### 1. `products.csv` (Food catalog)
+* **Structure:** `ID;Name;Insertion Date;Price;Brand;Available`
+* **Example:** `1;Almond Milk;22/07/2021;2.15 €;Bjorg;YES`
 
-### 2. `utenti.csv` (Anagrafica clienti POF)
-* **Struttura:** `ID;Nome;Cognome;Data di nascita;Indirizzo;Documento ID`
-* **Esempio:** `1;Mario;Rossi;23/02/1990;Via Roma 15;AS348945`
+### 2. `users.csv` (POF Customer Registry)
+* **Structure:** `ID;Name;Last Name;Birth Date;Address;Document ID`
+* **Example:** `1;Mario;Rossi;23/02/1990;Via Roma 15;AS348945`
 
-### 3. `vendite.csv` (Registro transazioni)
-* **Struttura:** `ID;ID Prodotto;ID Utente`
-* **Esempio:** `1;3;1`
+### 3. `sales.csv` (Transaction log)
+* **Structure:** `ID;Product ID;User ID`
+* **Example:** `1;3;1`
 
-## 🏗️ Architettura e Implementazione Tecnica
+## 🏗️ Architecture and Technical Implementation
 
-### 1. Programmazione ad Oggetti (OOP)
-Il software è strutturato per massimizzare l'**Incapsulamento**. Le classi nel package `models` proteggono lo stato degli oggetti tramite campi privati e forniscono l'accesso tramite metodi **Getter** e **Setter**. La logica di visualizzazione (`Main`) è rigorosamente separata dalla logica di business (`GestionaleService`), facilitando la manutenzione del codice.
+### 1. Object-Oriented Programming (OOP)
+The software is structured to maximize **Encapsulation**. Classes in the `models` package protect the state of objects using private fields and provide access through **Getter** and **Setter** methods. The presentation logic (`Main`) is strictly separated from the business logic (`ManagementService`), facilitating code maintenance.
 
-### 2. Focus Tecnico: Programmazione Funzionale (Java 17)
-Il sistema utilizza paradigmi moderni per la manipolazione dei dati:
-* **Interfacce Funzionali:** Il metodo `caricaCSV` accetta un `Consumer<String[]>` come parametro, rendendo il motore di parsing generico e riutilizzabile per diversi modelli (Utenti, Prodotti, Vendite).
-* **Lambda Expressions:** Utilizzate per mappare velocemente le righe dei file CSV in oggetti Java durante la fase di `startup`, riducendo la verbosità del codice.
-* **Stream API:** Implementate nel metodo `esportaDisponibili()` per filtrare i prodotti in stock e generare report dinamici, includendo la data corrente nel nome del file di output.
+### 2. Technical Focus: Functional Programming (Java 17)
+The system utilizes modern paradigms for data manipulation:
+* **Functional Interfaces:** The `loadCSV` method accepts a `Consumer<String[]>` s a parameter, making the parsing engine generic and reusable for different models (Users, Products, Sales).
+* **Lambda Expressions:** Used to quickly map CSV file rows into Java objects during the `startup` phase, reducing code verbosity.
+* **Stream API:** Implemented in the `exportAvailable()` method to filter in-stock products and generate dynamic reports, including the current date in the output filename.
 
-### 3. Robustezza e Validazione
-* **Gestione Eccezioni:** Implementazione di blocchi `try-catch` nel `Main` per prevenire crash da `NumberFormatException` (input utente non validi) e nel `Service` per gestire `IOException` durante l'accesso ai file di persistenza.
-* **Sincronizzazione:** Ogni operazione di vendita o restituzione aggiorna dinamicamente lo stato di disponibilità (`SI`/`NO`) degli oggetti e sincronizza immediatamente i file fisici per prevenire la perdita di dati.
+### 3. Robustness and Validation
+* **Exception Handling:** Implementation of `try-catch` blocks in `Main` to prevent crashes from `NumberFormatException` (invalid user inputs) and in the `Service` to handle `IOException` during access to persistence files.
+* **Synchronization:** Every sale or return operation dynamically updates the availability state (`YES`/`NO`) of the objects and immediately synchronizes the physical files to prevent data loss.
 
-## 📥 Clonazione del Repository
-Per scaricare il progetto in locale sul tuo PC, apri il terminale ed esegui:
+## 📥 Cloning the Repository
+To download the project locally to your PC, open the terminal and run:
 
 ```bash
 git clone https://github.com/sadsotti/pof-system.git
 ```
 
-Dopo la clonazione, entra nella cartella del progetto:
+After cloning, enter the project folder:
 ```bash
 cd pof-system
 ```
 
-## 🛠️ Istruzioni per la Compilazione ed Esecuzione
+## 🛠️ Build and Execution Instructions
 
-### Compilazione
-Il progetto utilizza **Apache Maven** per la gestione della build. Per compilare il codice sorgente e generare il file JAR eseguibile, lancia il seguente comando dalla root del progetto:
+### Build
+The project uses **Apache Maven** for build management. To compile the source code and generate the executable JAR file, run the following command from the project root:
 
 ```bash
 mvn clean package
 ```
 
-Al termine del processo, troverai il file generato nel percorso:
+At the end of the process, you will find the generated file in the path:
 `target/pof-system-0.0.1.jar`
 
-### Esecuzione
-Per avviare correttamente l'applicazione, assicurati che i file di persistenza (`prodotti.csv`, `utenti.csv`, `vendite.csv`) siano presenti nella stessa directory da cui lanci il comando. Esegui quindi:
+### Execution
+To start the application correctly, ensure that the persistence files (`products.csv`, `users.csv`, `sales.csv`) are present in the same directory from which you launch the command. Then run:
 
 ```bash
 java -jar target/pof-system-0.0.1.jar
 ```
 
-**Requisiti di sistema:** È necessario Java 17 o superiore installato, come specificato nella configurazione del compilatore Maven.
+**System Requirements:** Java 17 or higher must be installed, as specified in the Maven compiler configuration.
 
-## 🔗 Link Utili
+## 🔗 Useful Links
 
 - https://www.start2impact.it/  
 - https://linkedin.com/in/lorenzo-sottile  
